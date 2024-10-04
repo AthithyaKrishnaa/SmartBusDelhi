@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema Seat Reservation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #6a11cb, #2575fc);
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .seat-map {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .seat {
+            width: 50px;
+            height: 50px;
+            background-color: #a0a0a0;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            color: white;
+            transition: transform 0.2s, background-color 0.3s;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .seat.selected {
+            background-color: #28a745;
+            transform: scale(1.1);
+        }
+
+        .seat.occupied {
+            background-color: #dc3545;
+            cursor: not-allowed;
+        }
+
+        .seat:hover:not(.occupied) {
+            background-color: #5cb85c;
+            transform: scale(1.1);
+        }
+
+        .summary {
+            margin-top: 20px;
+        }
+
+        .summary p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .reserve-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+        }
+
+        .reserve-button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .reserve-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .bill {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            display: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .bill h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cinema Seat Reservation</h1>
+        <div class="seat-map" id="seatMap"></div>
+        
+        <div class="summary">
+            <p>Total Selected Seats: <span id="selectedCount">0</span></p>
+            <p>Price per seat: ₹<span id="seatPrice">800</span></p>
+            <p>Total Price: ₹<span id="totalPrice">0</span></p>
+        </div>
+        
+        <button class="reserve-button" id="reserveButton" disabled>Reserve Seats</button>
+
+        <div class="bill" id="bill">
+            <h2>Reservation Bill</h2>
+            <p>Seats Reserved: <span id="billSeats"></span></p>
+            <p>Total Amount: ₹<span id="billTotal"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const seatMap = document.getElementById('seatMap');
+        const selectedCount = document.getElementById('selectedCount');
+        const totalPrice = document.getElementById('totalPrice');
+        const reserveButton = document.getElementById('reserveButton');
+        const bill = document.getElementById('bill');
+        const billSeats = document.getElementById('billSeats');
+        const billTotal = document.getElementById('billTotal');
+        const seatPrice = 800;
+
+        const totalSeats = 100;
+        const occupiedSeats = [5, 12, 13, 22, 23, 32, 45];
+        const reservations = [];
+
+        function initializeSeats() {
+            for (let i = 1; i <= totalSeats; i++) {
+                const seat = document.createElement('div');
+                seat.className = 'seat';
+                seat.innerText = i;
+
+                if (occupiedSeats.includes(i)) {
+                    seat.classList.add('occupied');
+                    seat.innerText = 'X';
+                }
+
+                seat.addEventListener('click', () => {
+                    if (!seat.classList.contains('occupied')) {
+                        seat.classList.toggle('selected');
+                        if (seat.classList.contains('selected')) {
+                            reservations.push(i);
+                        } else {
+                            const index = reservations.indexOf(i);
+                            if (index > -1) {
+                                reservations.splice(index, 1);
+                            }
+                        }
+                        updateSelectedCount();
+                    }
+                });
+
+                seatMap.appendChild(seat);
+            }
+        }
+
+        function updateSelectedCount() {
+            const selectedCountValue = reservations.length;
+            selectedCount.innerText = selectedCountValue;
+            totalPrice.innerText = selectedCountValue * seatPrice;
+            reserveButton.disabled = selectedCountValue === 0;
+        }
+
+        reserveButton.addEventListener('click', () => {
+            reservations.forEach(seatNum => {
+                const seat = document.querySelector(.seat:nth-child(${seatNum}));
+                seat.classList.remove('selected');
+                seat.classList.add('occupied');
+                seat.innerText = 'X';
+            });
+
+            updateSelectedCount();
+            displayBill();
+            alert('Seats reserved successfully!');
+        });
+
+        function displayBill() {
+            billSeats.innerText = reservations.join(', ');
+            billTotal.innerText = reservations.length * seatPrice;
+            bill.style.display = 'block';
+        }
+
+        initializeSeats();
+    </script>
+</body>
+</html>
